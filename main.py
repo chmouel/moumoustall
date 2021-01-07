@@ -32,6 +32,7 @@ PROFILE = {
         "externalNetwork": "provider_net_cci_9",
         "installerVersion": "latest-4.5",
         "workerReplicas": "3",
+        "pullRequestJsonFile": "pull.secret.json",
     }
 }
 
@@ -79,7 +80,8 @@ def do_template(config, api_ip, apps_ip):
         elif param == "ingressFloatingIP":
             return apps_ip
         elif param == "pullSecret":
-            return open("./config/pull.secret.json", 'r').read()
+            return open(f"./config/{config['pullRequestJsonFile']}",
+                        'r').read()
         elif param in config:
             return config[param]
         raise Exception(f"Cannot replace {{{param}}} variable")
@@ -100,7 +102,8 @@ def post_install_tasks(install_dir, apps_ip, os_cloud):
     execute(cmd, check_error=f"Error running {cmd}")
     print(f"🗽 Creating letsencrypt certs for router")
     os.system(
-        f"bash -x scripts/install-router-cert.sh {authjson['clusterName']}")
+        f"bash scripts/install-router-cert.sh {authjson['clusterName']} >/dev/null"
+    )
 
 
 def uninstall_cluster(config, install_binary):
