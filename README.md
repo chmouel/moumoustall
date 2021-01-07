@@ -18,7 +18,7 @@ It supports :
 And will support in the future :
 
 - retries on failures
-- queuing by resources, if you have too many clusters spawn it will tell you or queu it.
+- queuing by resources, if you have too many clusters consuming resources...
 
 See [config yaml](./config/config.yaml.default) to see how to configure it.
 
