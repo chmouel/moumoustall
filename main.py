@@ -31,8 +31,9 @@ PROFILE = {
         "clusterName": "ci-pipeline-45",
         "externalNetwork": "provider_net_cci_9",
         "installerVersion": "latest-4.5",
-        "onlyMasters": True,
+        #"onlyMasters": True,
         "pullRequestJsonFile": "pull.secret.json",
+        "htpasswd": "htpasswd"
     }
 }
 
@@ -111,14 +112,17 @@ def post_install_tasks(config, install_dir, apps_ip):
     os.system(
         f"bash scripts/install-router-cert.sh {authjson['clusterName']} >/dev/null"
     )
+    if 'htpasswd' in config:
+        print(f"🗽 Creating extras users")
+        os.system(
+            f"bash scripts/install-router-cert.sh {install_dir}/auth/kubeconfig config/{config['htpasswd']} >/dev/null"
+        )
 
 
 def uninstall_cluster(config, install_binary):
     install_dir = pathlib.Path("installs") / config['clusterName']
-    print("⚰️ Cleaning cluster resources")
-    ret = os.system(
-        f"{install_binary} destroy cluster --dir={install_dir} --log-level=debug"
-    )
+    print("⚰️  Cleaning cluster resources")
+    ret = os.system(f"{install_binary} destroy cluster --dir={install_dir}")
     if ret != 0:
         raise Exception("Failure to destroy cluster")
 
@@ -130,32 +134,32 @@ def uninstall_cluster(config, install_binary):
                               silent=True)
 
     print(
-        f"⚒ Cleaning floating IPS {config['clusterName']}.{config['baseDomain']}"
+        f"🔱 Cleaning floating IPS for cluster {config['clusterName']}.{config['baseDomain']}"
     )
     ret = os.system(
         f"bash ./scripts/remove-floating-ips.sh {config['clusterName']} {config['osCloud']}"
     )
-
     if ret != 0:
         raise Exception("Could not cleanup floating ips.")
 
 
-def doprofile(config, args):
+def doprofile(args, config):
     # make sure this is unset
     os.environ["OS_CLOUD"] = ""
-    install_dir = pathlib.Path("installs") / config['clusterName']
+    install_dir = pathlib.Path("installs/") / config['clusterName']
     print(f"🧢 Downloading latest binary for {config['installerVersion']}")
     binaries_dir = pathlib.Path("binaries")
-    binaries_dir.mkdir(parents=True, mode=0o755)
+    if not binaries_dir.exists():
+        binaries_dir.mkdir(parents=True, mode=0o755)
     install_binary = downloader.download_installer(config["installerVersion"],
                                                    binaries_dir)
-
     if install_dir.exists():
         if args.uninstall:
             uninstall_cluster(config, install_binary)
         else:
             raise Exception(f"{str(install_dir)} exists already")
-    install_dir.mkdir(parents=True, mode=0o755)
+    else:
+        install_dir.mkdir(parents=True, mode=0o755)
 
     cleanup.cleanup_dns_names(config['clusterName'],
                               config['baseDomain'],
