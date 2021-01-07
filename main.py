@@ -94,10 +94,12 @@ def post_install_tasks(config, install_dir, apps_ip):
     print(f"🌸 Assigning floating ip for {infraID}-ingress-port")
     cmd = f"openstack --os-cloud {config['osCloud']} floating ip set --port {infraID}-ingress-port {apps_ip}"
     execute(cmd, check_error=f"Error running {cmd}")
-    print(f"🗽 Creating letsencrypt certs for router")
-    os.system(
-        f"bash scripts/install-router-cert.sh {authjson['clusterName']} >/dev/null"
-    )
+
+    if os.path.exists(os.path.expanduser("~/.acme.sh/acme.sh")):
+        print(f"🗽 Creating letsencrypt certs for router")
+        os.system(
+            f"bash scripts/install-router-cert.sh {authjson['clusterName']} >/dev/null"
+        )
     if 'htpasswd' in config:
         print(f"🗽 Creating extras users")
         os.system(
