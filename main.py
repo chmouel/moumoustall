@@ -19,23 +19,9 @@ import pathlib
 import re
 import subprocess
 import sys
+import yaml
 
 from lib import cleanup, downloader, route53
-from lib.cleanup import cleanup_dns_names
-
-PROFILE = {
-    "ci-45": {
-        "template": "default",
-        "osCloud": "qapipeline",
-        "baseDomain": "devcluster.openshift.com",
-        "clusterName": "ci-pipeline-45",
-        "externalNetwork": "provider_net_cci_9",
-        "installerVersion": "latest-4.5",
-        #"onlyMasters": True,
-        "pullRequestJsonFile": "pull.secret.json",
-        "htpasswd": "htpasswd"
-    }
-}
 
 
 def execute(command, check_error=""):
@@ -205,6 +191,9 @@ def main():
                         help="Uninstall profile if it's here already",
                         action="store_true",
                         default=False)
+    parser.add_argument("--config-file",
+                        default="./config/config.yaml",
+                        help="path to config file with profiles")
     parser.add_argument("--all-profiles",
                         "-a",
                         help="Run for all profiles",
@@ -212,8 +201,10 @@ def main():
                         default=False)
     parser.add_argument("profiles", nargs="*")
     args = parser.parse_args(sys.argv[1:])
+
+    CONFIG = yaml.safe_load(open(args.config_file, 'r'))
     if args.all_profiles:
-        profiles = PROFILE.keys()
+        profiles = CONFIG.keys()
     elif not args.profiles:
         print("Missing profile as argument")
         parser.print_help()
@@ -222,10 +213,11 @@ def main():
         profiles = args.profiles
 
     for profile in profiles:
-        if not profile in PROFILE:
+        if not profile in CONFIG:
             raise Exception(f"Profile: {profile} is not in config")
-        config = PROFILE[profile]
-        doprofile(args, config)
+        config = CONFIG[profile]
+        print(config)
+        #doprofile(args, config)
 
 
 if __name__ == "__main__":

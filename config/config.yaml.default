@@ -1,0 +1,10 @@
+profilename:
+  baseDomain: devcluster.openshift.com # if you use openshift devcluster AWS then keep it like this
+  clusterName: clustername # the actual clustername which is used in dns name and around everywhere
+  externalNetwork: provider_net_cci_9 # the external  network to use
+  htpasswd: htpasswd # the htpassword file in config directory to add other users
+  installerVersion: latest-4.5 # which version to install from mirrors.openshift.org
+  osCloud: qapipeline # the  openstack profile in cloud.yaml
+  pullRequestJsonFile: pull.secret.json # the pull request json file in config directory
+  template: default # which template to use, default to the default one which should handle mostly about everything
+  onlyMasters: "true" # wether to install only the masters making them as schedulable and remove the workers nodes see https://is.gd/XHPD18
