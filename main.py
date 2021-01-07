@@ -31,7 +31,7 @@ PROFILE = {
         "clusterName": "ci-pipeline-45",
         "externalNetwork": "provider_net_cci_9",
         "installerVersion": "latest-4.5",
-        "workerReplicas": "3",
+        "onlyMasters": True,
         "pullRequestJsonFile": "pull.secret.json",
     }
 }
@@ -93,12 +93,19 @@ def do_template(config, api_ip, apps_ip):
     )
 
 
-def post_install_tasks(install_dir, apps_ip, os_cloud):
+def post_install_tasks(config, install_dir, apps_ip):
     authjson = pathlib.Path(install_dir) / "metadata.json"
     authjson = json.load(authjson.open())
+
+    if 'onlyMasters' in config and config['onlyMasters']:
+        print(f"🌆 Scaling down clusters to only masters")
+        os.system(
+            f"bash scripts/scale-to-three-node.sh {install_dir}/auth/kubeconfig >/dev/null"
+        )
+
     infraID = authjson['infraID']
     print(f"🌸 Assigning floating ip for {infraID}-ingress-port")
-    cmd = f"openstack --os-cloud {os_cloud} floating ip set --port {infraID}-ingress-port {apps_ip}"
+    cmd = f"openstack --os-cloud {config['osCloud']} floating ip set --port {infraID}-ingress-port {apps_ip}"
     execute(cmd, check_error=f"Error running {cmd}")
     print(f"🗽 Creating letsencrypt certs for router")
     os.system(
@@ -180,8 +187,11 @@ def doprofile(config, args):
         print("👊 It's up to you to debug why it failed!!")
         sys.exit(1)
 
-    post_install_tasks(f"installs/{config['clusterName']}", ips["apps"],
-                       config['osCloud'])
+    post_install_tasks(
+        config,
+        f"installs/{config['clusterName']}",
+        ips["apps"],
+    )
 
 
 def main():
@@ -210,7 +220,8 @@ def main():
     for profile in profiles:
         if not profile in PROFILE:
             raise Exception(f"Profile: {profile} is not in config")
-        doprofile(args, PROFILE[profile])
+        config = PROFILE[profile]
+        doprofile(args, config)
 
 
 if __name__ == "__main__":

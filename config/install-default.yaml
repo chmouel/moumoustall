@@ -7,7 +7,7 @@ compute:
   platform: 
     openstack:
       type: ci.m4.xlarge
-  replicas: {{workerReplicas}}
+  replicas: 3
 controlPlane:
   hyperthreading: Enabled
   name: master
