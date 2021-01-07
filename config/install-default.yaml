@@ -1,0 +1,38 @@
+apiVersion: v1
+baseDomain: {{baseDomain}}
+
+compute:
+- hyperthreading: Enabled
+  name: worker
+  platform: 
+    openstack:
+      type: ci.m4.xlarge
+  replicas: {{workerReplicas}}
+controlPlane:
+  hyperthreading: Enabled
+  name: master
+  platform: {}
+  replicas: 3
+metadata:
+  name: {{clusterName}}
+networking:
+  clusterNetwork:
+  - cidr: 10.128.0.0/14
+    hostPrefix: 23
+  machineCIDR: 192.168.0.0/16
+  networkType: OpenShiftSDN
+  serviceNetwork:
+  - 172.30.0.0/16
+platform:
+  openstack:
+    cloud: {{osCloud}}
+    computeFlavor: ci.m4.xlarge
+    externalNetwork: {{externalNetwork}}
+    lbFloatingIP: {{lbFloatingIP}}
+    ingressFloatingIP: {{ingressFloatingIP}}
+    octaviaSupport: "0"
+    region: "regionOne"
+    trunkSupport: "1"
+pullSecret: '{{pullSecret}}'
+sshKey: |
+  ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDR2PTr+y+abp3SPGOdd1fg9/Vyg4gIDUfCKZXqXfi1+2SmJeBW4E+kN6jCjVa99330FDiam8WQLeqWe3L2cFADrzW4liusmJjMHzmJx91pRMfrjw7DxMKT7I4v/bNDa8Ld8IVkZ94z6YG3/vCK/Z6cGL8PDwYbu5Ao7GHKQ83xRXj27Nmv/ZsTVVqoL6gl+Z6aUPMAzYmV5ap9kf3BssHGy1AZ2yge7/wCq0uCY3TDFtPTNliZ5QQfdm7U0hbbbRFXKK0ReDSGYfoPVoY1fePZDCf8HJY78GBIEgbwpgVSqNTSqQOjfhLa9Mhtdra8yrnaCNPEwK3aBmqF7hS+GCRO+hoT/5d1Rrj4L/o/uZ91lK4H/BkdRLU/X+6QEEGkoTHkBbhYy+ZAh1sBymX7/BCY0Rc1gLO3uQpo0xEfYGCKATpWcSB3a9pgOIDOPkcuh0TQyzfQfeDv+nsLK6zU/Zh1JM0HxVOf+KS4EsHq4tDEwhRo3WLawaWer7Zfdj7KGiGQqOAv1F1Gmujx5YJVK0zgWftJ0Cazg06HtRyNu4AyM5i1YtB1UfafgBOQXw1N8eK7Km3nrqzDKzNRtM+yexu3YxncklpU26Vq2Ih+FUFCBHonQQP/U2q+NF7und4Wsyv6yerNmVfbVor6Ig4S8ivZpO3U5wTsFYrwsgymlMMNJw== chmouel@chmouel.com OpenStack
