@@ -11,6 +11,7 @@ It supports :
 - multiple profiles for diffrent version
 - uninstall, clean up automatically
 - adding htpasswd
+- emojis 😋
 - scale down to 3 nodes ie: https://www.openshift.com/blog/delivering-a-three-node-architecture-for-edge-deployments
 - create letsecnrypt certs on router if you have [acme.sh](https://github.com/acmesh-official/acme.sh) installed and configured.
 
