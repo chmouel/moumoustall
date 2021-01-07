@@ -84,6 +84,12 @@ def post_install_tasks(config, install_dir, apps_ip):
     authjson = pathlib.Path(install_dir) / "metadata.json"
     authjson = json.load(authjson.open())
 
+    if 'htpasswd' in config:
+        print(f"👪  Creating extras users from config/{config['htpasswd']}")
+        os.system(
+            f"bash scripts/add-oauth-htpasswd.sh {install_dir}/auth/kubeconfig config/{config['htpasswd']} >/dev/null"
+        )
+
     if 'onlyMasters' in config and config['onlyMasters']:
         print(f"🌆 Scaling down clusters to only masters")
         os.system(
@@ -100,16 +106,11 @@ def post_install_tasks(config, install_dir, apps_ip):
         os.system(
             f"bash scripts/install-router-cert.sh {authjson['clusterName']} >/dev/null"
         )
-    if 'htpasswd' in config:
-        print(f"🗽 Creating extras users")
-        os.system(
-            f"bash scripts/install-router-cert.sh {install_dir}/auth/kubeconfig config/{config['htpasswd']} >/dev/null"
-        )
 
 
 def uninstall_cluster(config, install_binary):
     install_dir = pathlib.Path("installs") / config['clusterName']
-    print("⚰️  Cleaning cluster resources")
+    print("⚰️  Cleaning old cluster resources")
     ret = os.system(f"{install_binary} destroy cluster --dir={install_dir}")
     if ret != 0:
         raise Exception("Failure to destroy cluster")
@@ -218,8 +219,7 @@ def main():
         if not profile in CONFIG:
             raise Exception(f"Profile: {profile} is not in config")
         config = CONFIG[profile]
-        print(config)
-        #doprofile(args, config)
+        doprofile(args, config)
 
 
 if __name__ == "__main__":
