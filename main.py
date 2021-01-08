@@ -219,7 +219,7 @@ def main():
         profiles = args.profiles
 
     for profile in profiles:
-        if not profile in CONFIG:
+        if profile not in CONFIG:
             raise Exception(f"Profile: {profile} is not in config")
         config = CONFIG[profile]
         doprofile(args, config)
