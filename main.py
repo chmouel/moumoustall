@@ -140,8 +140,11 @@ def doprofile(args, config):
     binaries_dir = pathlib.Path("binaries")
     if not binaries_dir.exists():
         binaries_dir.mkdir(parents=True, mode=0o755)
+    installer_channel = "installer_channel" in config and config[
+        'installer_channel'] or 'prod'
     install_binary = downloader.download_installer(config["installerVersion"],
-                                                   binaries_dir)
+                                                   binaries_dir,
+                                                   source=installer_channel)
     if install_dir.exists():
         if args.uninstall:
             uninstall_cluster(config, install_binary)

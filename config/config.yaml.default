@@ -8,3 +8,4 @@ profilename:
   pullRequestJsonFile: pull.secret.json # the pull request json file in config directory
   template: default # which template to use, default to the default one which should handle mostly about everything
   onlyMasters: "true" # wether to install only the masters making them as schedulable and remove the workers nodes see https://is.gd/XHPD18
+  installer_channel: prod # can be prod (stable), prev (preview), devel
