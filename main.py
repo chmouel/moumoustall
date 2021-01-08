@@ -136,7 +136,9 @@ def doprofile(args, config):
     # make sure this is unset
     os.environ["OS_CLOUD"] = ""
     install_dir = pathlib.Path("installs/") / config['clusterName']
-    print(f"🧢 Downloading latest binary for {config['installerVersion']}")
+    print(
+        f"🌊 Downloading openshift installer for version {config['installerVersion'].replace('latest-', '')}"
+    )
     binaries_dir = pathlib.Path("binaries")
     if not binaries_dir.exists():
         binaries_dir.mkdir(parents=True, mode=0o755)
@@ -145,17 +147,21 @@ def doprofile(args, config):
     install_binary = downloader.download_installer(config["installerVersion"],
                                                    binaries_dir,
                                                    source=installer_channel)
-    if install_dir.exists():
+    if (install_dir / "metadata.json").exists():
         if args.uninstall:
             uninstall_cluster(config, install_binary)
         else:
             raise Exception(f"{str(install_dir)} exists already")
-    else:
+
+    if not install_dir.exists():
         install_dir.mkdir(parents=True, mode=0o755)
 
     cleanup.cleanup_dns_names(config['clusterName'],
                               config['baseDomain'],
                               silent=True)
+    if args.no_install:
+        return
+
     print(
         f"🛢  Creating Floating IPS for {config['clusterName']}.{config['baseDomain']}"
     )
@@ -197,6 +203,13 @@ def main():
                         help="Uninstall profile if it's here already",
                         action="store_true",
                         default=False)
+    parser.add_argument(
+        "--no-install",
+        "-N",
+        help="Do not install, combined to -u you will do just an uninstall",
+        action="store_true",
+        default=False)
+
     parser.add_argument("--config-file",
                         default="./config/config.yaml",
                         help="path to config file with profiles")
