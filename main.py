@@ -209,10 +209,16 @@ def main():
         help="Do not install, combined to -u you will do just an uninstall",
         action="store_true",
         default=False)
+    parser.add_argument("--list-profiles",
+                        "-L",
+                        help="List all profiles available",
+                        action="store_true",
+                        default=False)
 
     parser.add_argument("--config-file",
                         default="./config/config.yaml",
                         help="path to config file with profiles")
+
     parser.add_argument("--all-profiles",
                         "-a",
                         help="Run for all profiles",
@@ -222,6 +228,19 @@ def main():
     args = parser.parse_args(sys.argv[1:])
 
     CONFIG = yaml.safe_load(open(args.config_file, 'r'))
+
+    if args.list_profiles:
+        print("Profiles available:")
+        print("-------------------")
+        for profile in CONFIG.keys():
+            metadatajson = pathlib.Path(
+                "installs") / CONFIG[profile]['clusterName'] / 'metadata.json'
+            installed = ""
+            if metadatajson.exists():
+                installed = "Installed"
+            print("%-10s%-10s" % (profile, installed))
+        sys.exit(0)
+
     if args.all_profiles:
         profiles = CONFIG.keys()
     elif not args.profiles:
