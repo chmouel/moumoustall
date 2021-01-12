@@ -12,7 +12,7 @@ It supports :
 - uninstall, clean up automatically
 - adding htpasswd
 - emojis 😋
-- scale down to 3 nodes ie: https://www.openshift.com/blog/delivering-a-three-node-architecture-for-edge-deployments
+- ~scale down to 3 nodes ie: https://www.openshift.com/blog/delivering-a-three-node-architecture-for-edge-deployments~ (not working on openstack atm)
 - create letsecnrypt certs on router if you have [acme.sh](https://github.com/acmesh-official/acme.sh) installed and configured.
 
 And will support in the future :
@@ -21,6 +21,10 @@ And will support in the future :
 - queuing by resources, if you have too many clusters consuming resources...
 
 See [config yaml](./config/config.yaml.default) to see how to configure it.
+
+## Screenshot
+
+![Screenshot](/.github/screenshot.png?raw=true "Screenshot of the moumoustaller")
 
 ## Name
 
