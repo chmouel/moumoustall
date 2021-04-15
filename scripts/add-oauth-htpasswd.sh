@@ -32,6 +32,7 @@ function os4_add_htpasswd_auth() {
     for user in $(awk -F: '{print $1}' ${HTPASSWORD});do
         ${OC} adm policy add-cluster-role-to-user cluster-admin ${user}
     done
+	${OC} delete secrets kubeadmin -n kube-system || true
 }
 
 os4_add_htpasswd_auth
