@@ -190,11 +190,14 @@ def doprofile(args, config):
         print("👊 It's up to you to debug why it failed!!")
         sys.exit(1)
 
-    post_install_tasks(
-        config,
-        f"installs/{config['clusterName']}",
-        ips["apps"],
-    )
+    if args.post_install_script:
+        os.system(args.post_install_script)
+    else:
+        post_install_tasks(
+            config,
+            f"installs/{config['clusterName']}",
+            ips["apps"],
+        )
 
 
 def main():
@@ -219,6 +222,9 @@ def main():
     parser.add_argument("--config-file",
                         default="./config/config.yaml",
                         help="path to config file with profiles")
+
+    parser.add_argument("--post-install-script",
+                        help="Post install script to do")
 
     parser.add_argument("--all-profiles",
                         "-a",

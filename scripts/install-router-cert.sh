@@ -23,6 +23,9 @@ function install_cert() {
 
 function configure_router_certs() {
 	${OC} --kubeconfig=$KUBECONFIG delete secret router-certs -n openshift-ingress 2>/dev/null || true; 
+	
+	${OC} get secret router-certs -n openshift-ingress && ${OC} delete secret router-certs -n openshift-ingress
+
 	${OC} create secret tls router-certs --cert=${CERTDIR}/fullchain.pem --key=${CERTDIR}/key.pem -n openshift-ingress && \
 	${OC} patch ingresscontroller default -n openshift-ingress-operator --type=merge --patch='{"spec": { "defaultCertificate": { "name": "router-certs" }}}'
 }
